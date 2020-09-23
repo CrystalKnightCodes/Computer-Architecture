@@ -10,7 +10,7 @@ class CPU:
         """Construct a new CPU."""
         # Internal Registers
         self.pc     = 0b00000000
-        self.ir     = NOP
+        self.ir     = operation_codes['NOP']
         self.mar    = 0b00000000
         self.mdr    = 0b00000000
         self.fl     = 0b00000000  # 00000LGE - only last 3 bits matter
