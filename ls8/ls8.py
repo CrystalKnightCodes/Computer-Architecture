@@ -31,7 +31,7 @@ if len(sys.argv) > 1:
 
 print("Command Line Arguments:", cla)
 
-file_name = cla.get('file', None)
+file_name = cla.get('file', 'examples/mult.ls8')
 base = cla.get('base', 2)
 
 if file_name:
