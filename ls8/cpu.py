@@ -22,22 +22,22 @@ class CPU:
         self.ram = [0] * 265 # size of the computer's memory
 
 
-    def load(self):
+    def load(self, program=None):
         """Load a program into memory."""
 
         address = 0
 
-        # For now, we've just hardcoded a program:
-
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        if program == None:
+            # Default program
+            program = [
+                # From print8.ls8
+                0b10000010, # LDI R0,8
+                0b00000000,
+                0b00001000,
+                0b01000111, # PRN R0
+                0b00000000,
+                0b00000001, # HLT
+            ]
 
         for instruction in program:
             self.ram[address] = instruction
@@ -83,13 +83,17 @@ class CPU:
                 break
             elif self.ir == LDI:
                 self.reg[self.ram_read(self.pc+1)] = self.ram_read(self.pc+2)
-                self.pc += 3
+            elif self.ir == MUL:
+                self.reg[self.ram_read(self.pc+1)] = self.reg[self.ram_read(self.pc+1)] + self.reg[self.ram_read(self.pc+2)]
             elif self.ir == PRN:
                 print(self.reg[self.ram_read(self.pc+1)])
-                self.pc +=2
+            elif self.ir == NOP:
+                print("No Operation encountered. Continuing.")
             else:
                 print("Unknown command. Halting program. Goodbye.")
                 break
+
+            self.pc += ((self.ir & 0b11000000) >> 6) + 1
 
     def ram_read(self, address = None):
         if address is not None:
