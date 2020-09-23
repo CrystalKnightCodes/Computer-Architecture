@@ -2,20 +2,25 @@
 ----------------------
 OPCODES (Instructions)
 ----------------------
-1. Basic
 """
+operation_codes = [0] * 64
+operations_table = {
+
+
+# 1. Basic
+
 # No operation. Do nothing for this instruction.
 # Machine code:
 # 00000000
 # 00
-NOP         = 0b00000000
+'NOP'  : 0b00000000,
 
 # HLT
 # Halt the CPU (and exit the emulator).
 # Machine code:
 # 00000001 
 # 01
-HLT         = 0b00000001
+'HLT'  : 0b00000001,
 
 # INT register
 # Issue the interrupt number stored in the given register.
@@ -23,7 +28,7 @@ HLT         = 0b00000001
 # Machine code:
 # 01010010 00000rrr
 # 52 0r
-INT         = 0b01010010
+'INT'  : 0b01010010,
 
 # IRET
 # Return from an interrupt handler.
@@ -35,7 +40,7 @@ INT         = 0b01010010
 # Machine code:
 # 00010011
 # 13
-IRET        = 0b00010011
+'IRET' : 0b00010011,
 
 # CALL register
 # Calls a subroutine (function) at the address stored in the register.
@@ -44,25 +49,25 @@ IRET        = 0b00010011
 # Machine code:
 # 01010000 00000rrr
 # 50 0r
-CALL        = 0b01010000
+'CALL' : 0b01010000,
 
-"""
-2. Memory Read/Write
-"""
+
+# 2. Memory Read/Write
+
 # LD registerA registerB
 # Loads registerA with the value at the memory address stored in registerB.
 # This opcode reads from memory.
 # Machine code:
 # 10000011 00000aaa 00000bbb
 # 83 0a 0b
-LD          = 0b10000011
+'LD'   : 0b10000011,
 
 # LDI register immediate
 # Set the value of a register to an integer.
 # Machine code:
 # 10000010 00000rrr iiiiiiii
 # 82 0r ii
-LDI         = 0b10000010
+'LDI'  : 0b10000010,
 
 # ST registerA registerB
 # Store value in registerB in the address stored in registerA.
@@ -70,11 +75,11 @@ LDI         = 0b10000010
 # Machine code:
 # 10000100 00000aaa 00000bbb
 # 84 0a 0b
-ST          = 0b10000100
+'ST'    : 0b10000100,
 
-"""
-3. Stack Manipulation
-"""
+
+# 3. Stack Manipulation
+
 # PUSH register
 # Push the value in the given register on the stack.
 # Decrement the SP.
@@ -82,7 +87,7 @@ ST          = 0b10000100
 # Machine code:
 # 01000101 00000rrr
 # 45 0r
-PUSH        = 0b01000101
+'PUSH' : 0b01000101,
 
 # RET
 # Return from subroutine.
@@ -90,7 +95,7 @@ PUSH        = 0b01000101
 # Machine Code:
 # 00010001
 # 11
-RET         = 0b00010001
+'RET'  : 0b00010001,
 
 # POP register
 # Pop the value at the top of the stack into the given register.
@@ -99,69 +104,69 @@ RET         = 0b00010001
 # Machine code:
 # 01000110 00000rrr
 # 46 0r
-POP         = 0b01000110
+'POP'  : 0b01000110,
 
-"""
-4. Jump & Conditional Jump
-"""
+
+# 4. Jump & Conditional Jump
+
 # JMP register
 # Jump to the address stored in the given register.
 # Set the PC to the address stored in the given register.
 # Machine code:
 # 01010100 00000rrr
 # 54 0r
-JMP         = 0b01010100
+'JMP'  : 0b01010100,
 
 # JEQ register
 # If equal flag is set (true), jump to the address stored in the given register.
 # Machine code:
 # 01010101 00000rrr
 # 55 0r
-JEQ         = 0b01010101
+'JEQ'  : 0b01010101,
 
 # JNE register
 # If E flag is clear (false, 0), jump to the address stored in the given register.
 # Machine code:
 # 01010110 00000rrr
 # 56 0r
-JNE         = 0b01010110
+'JNE'  : 0b01010110,
 
 # JGE register
 # If greater-than flag or equal flag is set (true), jump to the address stored in the given register.
 # 01011010 00000rrr
 # 5A 0r
-JGE         = 0b01011010
+'JGE'  : 0b01011010,
 
 # JGT register
 # If greater-than flag is set (true), jump to the address stored in the given register.
 # Machine code:
 # 01010111 00000rrr
 # 57 0r
-JGT         = 0b01010111
+'JGT'  : 0b01010111,
 
 # JLE register
 # If less-than flag or equal flag is set (true), jump to the address stored in the given register.
 # 01011001 00000rrr
 # 59 0r
-JLE         = 0b01011001
+'JLE'  : 0b01011001,
 
 # JLT register
 # If less-than flag is set (true), jump to the address stored in the given register.
 # Machine code:
 # 01011000 00000rrr
 # 58 0r
-JLT         = 0b01011000
+'JLT'  : 0b01011000,
 
-"""
-I/O Instructions
-"""
+
+# I/O Instructions
+
 # PRA register pseudo-instruction
 # Print alpha character value stored in the given register.
 # Print to the console the ASCII character corresponding to the value in the register.
 # Machine code:
 # 01001000 00000rrr
 # 48 0r
-PRA         = 0b01001000
+'PRA'  : 0b01001000,
 
 # PRN register pseudo-instruction
 # Print numeric value stored in the given register.
@@ -169,18 +174,18 @@ PRA         = 0b01001000
 # Machine code:
 # 01000111 00000rrr
 # 47 0r
-PRN         = 0b01000111
+'PRN'  : 0b01000111,
 
-"""
-ALU Instructions
-"""
+
+# ALU Instructions
+
 # This is an instruction handled by the ALU.
 # ADD registerA registerB
 # Add the value in two registers and store the result in registerA.
 # Machine code:
 # 10100000 00000aaa 00000bbb
 # A0 0a 0b
-ADD         = 0b10100000
+'ADD'  : 0b10100000,
 
 # This is an instruction handled by the ALU.
 # AND registerA registerB
@@ -188,7 +193,7 @@ ADD         = 0b10100000
 # Machine code:
 # 10101000 00000aaa 00000bbb
 # A8 0a 0b
-AND         = 0b10101000
+'AND'  : 0b10101000,
 
 # This is an instruction handled by the ALU.
 # CMP registerA registerB
@@ -199,7 +204,7 @@ AND         = 0b10101000
 # Machine code:
 # 10100111 00000aaa 00000bbb
 # A7 0a 0b
-CMP         = 0b10100111
+'CMP'  : 0b10100111,
 
 # This is an instruction handled by the ALU.
 # DEC register
@@ -207,7 +212,7 @@ CMP         = 0b10100111
 # Machine code:
 # 01100110 00000rrr
 # 66 0r
-DEC         = 0b01100110
+'DEC'  : 0b01100110,
 
 # This is an instruction handled by the ALU.
 # DIV registerA registerB
@@ -216,7 +221,7 @@ DEC         = 0b01100110
 # Machine code:
 # 10100011 00000aaa 00000bbb
 # A3 0a 0b
-DIV         = 0b10100011
+'DIV'  : 0b10100011,
 
 # This is an instruction handled by the ALU.
 # INC register
@@ -224,7 +229,7 @@ DIV         = 0b10100011
 # Machine code:
 # 01100101 00000rrr
 # 65 0r
-INC         = 0b01100101
+'INC'  : 0b01100101,
 
 # This is an instruction handled by the ALU.
 # MOD registerA registerB
@@ -233,7 +238,7 @@ INC         = 0b01100101
 # Machine code:
 # 10100100 00000aaa 00000bbb
 # A4 0a 0b
-MOD         = 0b10100100
+'MOD'  : 0b10100100,
 
 # This is an instruction handled by the ALU.
 # MUL registerA registerB
@@ -241,7 +246,7 @@ MOD         = 0b10100100
 # Machine code:
 # 10100010 00000aaa 00000bbb
 # A2 0a 0b
-MUL         = 0b10100010
+'MUL'  : 0b10100010,
 
 # This is an instruction handled by the ALU.
 # NOT register
@@ -249,7 +254,7 @@ MUL         = 0b10100010
 # Machine code:
 # 01101001 00000rrr
 # 69 0r
-NOT         = 0b01101001
+'NOT'  : 0b01101001,
 
 # This is an instruction handled by the ALU.
 # OR registerA registerB
@@ -257,19 +262,19 @@ NOT         = 0b01101001
 # Machine code:
 # 10101010 00000aaa 00000bbb
 # AA 0a 0b
-OR          = 0b10101010
+'OR'   : 0b10101010,
 
 # This is an instruction handled by the ALU.
 # Shift the value in registerA left by the number of bits specified in registerB, filling the low bits with 0.
 # 10101100 00000aaa 00000bbb
 # AC 0a 0b
-SHL         = 0b10101100
+'SHL'  : 0b10101100,
 
 # This is an instruction handled by the ALU.
 # Shift the value in registerA right by the number of bits specified in registerB, filling the high bits with 0.
 # 10101101 00000aaa 00000bbb
 # AD 0a 0b
-SHR         = 0b10101101
+'SHR'  : 0b10101101,
 
 # This is an instruction handled by the ALU.
 # SUB registerA registerB
@@ -277,7 +282,7 @@ SHR         = 0b10101101
 # Machine code:
 # 10100001 00000aaa 00000bbb
 # A1 0a 0b
-SUB         = 0b10100001
+'SUB'  : 0b10100001,
 
 # This is an instruction handled by the ALU.
 # XOR registerA registerB
@@ -285,8 +290,19 @@ SUB         = 0b10100001
 # Machine code:
 # 10101011 00000aaa 00000bbb
 # AB 0a 0b
-XOR         = 0b10101011
+'XOR' : 0b10101011
+
+}
 
 """
 END OPCODE TABLE 
 """ 
+
+if __name__ == "__main__":
+
+    for key in operations_table:
+        index = operations_table[key] & 0b00111111
+        operation_codes[index] = key
+
+
+    print(operation_codes)
