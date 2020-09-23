@@ -19,7 +19,16 @@ class CPU:
         self.reg = [0] * 8  # this is the CPU's register
 
         # Memory
-        self.ram = [0] * 265 # size of the computer's memory
+        self.ram = [0] * 256 # size of the computer's memory
+
+        # Operations
+        self.ops = [0] * 256
+
+        # Instructions
+        self.ins = Instructions(self)
+
+        for key in operation_codes:
+            self.ops[operation_codes[key]] = getattr(self.ins, "handle_" + key, 0)
 
 
     def load(self, program=None):
@@ -74,26 +83,41 @@ class CPU:
         print()
 
     def run(self):
-        """Run the CPU."""
         while True:
             self.ir = self.ram_read(self.pc)
 
-            if self.ir == HLT:
-                print("Halting program. Goodbye.")
-                break
-            elif self.ir == LDI:
-                self.reg[self.ram_read(self.pc+1)] = self.ram_read(self.pc+2)
-            elif self.ir == MUL:
-                self.reg[self.ram_read(self.pc+1)] = self.reg[self.ram_read(self.pc+1)] + self.reg[self.ram_read(self.pc+2)]
-            elif self.ir == PRN:
-                print(self.reg[self.ram_read(self.pc+1)])
-            elif self.ir == NOP:
-                print("No Operation encountered. Continuing.")
+            arguments = []
+            # Build arguments array
+            for index in range((self.ir >> 6)):
+                arguments.append(self.ram_read(self.pc+1+index))
+
+            # Call the standard instruction and pass to arguments array
+            if self.ops[self.ir]:
+                self.ops[self.ir](*arguments)
             else:
-                print("Unknown command. Halting program. Goodbye.")
+                print(f"Unknown Operations Code: {self.ir} Program Counter: {self.pc}.")
                 break
 
-            self.pc += ((self.ir & 0b11000000) >> 6) + 1
+            # Increment the program counter
+            if (self.ir & 0b00010000) == 0:
+                self.pc = (self.pc + ((self.ir >> 6) + 1)) & 0b11111111
+
+            # if self.ir == HLT:
+            #     print("Halting program. Goodbye.")
+            #     break
+            # elif self.ir == LDI:
+            #     self.reg[self.ram_read(self.pc+1)] = self.ram_read(self.pc+2)
+            # elif self.ir == MUL:
+            #     self.reg[self.ram_read(self.pc+1)] = self.reg[self.ram_read(self.pc+1)] + self.reg[self.ram_read(self.pc+2)]
+            # elif self.ir == PRN:
+            #     print(self.reg[self.ram_read(self.pc+1)])
+            # elif self.ir == NOP:
+            #     print("No Operation encountered. Continuing.")
+            # else:
+            #     print("Unknown command. Halting program. Goodbye.")
+            #     break
+
+            # self.pc += ((self.ir & 0b11000000) >> 6) + 1
 
     def ram_read(self, address = None):
         if address is not None:

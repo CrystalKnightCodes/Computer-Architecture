@@ -70,7 +70,7 @@ class Instructions():
     # 01
     HLT         = 0b00000001
     def handle_HLT(self):
-        sys.exit("HALT called! BRANCH Exiting...")
+        sys.exit("HALT called! Exiting...")
 
     # INT register
     # Issue the interrupt number stored in the given register.
