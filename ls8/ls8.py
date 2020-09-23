@@ -31,7 +31,7 @@ if len(sys.argv) > 1:
 
 print("Command Line Arguments:", cla)
 
-file_name = cla.get('file', ls8/examples/interrupts.ls8)
+file_name = cla.get('file', None)
 base = cla.get('base', 2)
 
 if file_name:
@@ -61,6 +61,6 @@ if file_name:
         sys.exit(1)
 
 else:
-    cpu.load(second="Hello, World!")
-    
+    cpu.load()
+
 cpu.run()
