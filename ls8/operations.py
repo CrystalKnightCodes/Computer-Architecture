@@ -1,4 +1,5 @@
 import sys
+
 """
 ----------------------
 OPERATION CODES
@@ -46,7 +47,6 @@ BEGIN OPERATION CODE INSTRUCTIONS
 class Instructions():
     def __init__(self, cpu):
         self.cpu = cpu
-
 
     """
     Basic
@@ -230,7 +230,7 @@ class Instructions():
 
         if operand1 < operand2:
             self.cpu.fl = self.cpu.fl | 0b00000100
-        elif operand1 < operand2:
+        elif operand1 > operand2:
             self.cpu.fl = self.cpu.fl | 0b00000010
         else:
             self.cpu.fl = self.cpu.fl | 0b00000001

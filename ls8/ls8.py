@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Main."""
 
 import sys
@@ -14,19 +12,19 @@ if len(sys.argv) > 1:
     for index in range(1, len(sys.argv)):
         cla = sys.argv[index]
 
-        #Split arguments into resources
+        # Split arguments into resources
         resource = cla.split('=', 1)
-        #Ignore leading dashes
+        # Ignore leading dashes
         if resource[0].startswith('-') or resource[0].startswith('--'):
             pass
 
         if len(resource) == 2:
-            #Resource has value
+            # Resource has value
             cla[resource[0]] = resource[1]
         elif len(resource) == 1:
             cla[resource[0]] = 1
         else:
-            #Skip if invalid
+            # Skip if invalid
             pass
 
 file_name = cla.get('file', 'examples/tests.ls8')

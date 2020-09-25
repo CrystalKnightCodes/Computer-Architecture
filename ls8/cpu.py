@@ -30,7 +30,6 @@ class CPU:
         for key in operation_codes:
             self.ops[operation_codes[key]] = getattr(self.ins, "handle_" + key, 0)
 
-
     def load(self, program=None):
         """Load a program into memory."""
 
@@ -52,16 +51,6 @@ class CPU:
             self.ram[address] = instruction
             address += 1
 
-
-    def alu(self, op, reg_a, reg_b):
-        """ALU operations."""
-
-        if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
-        else:
-            raise Exception("Unsupported ALU operation")
-
     def trace(self):
         """
         Handy function to print out the CPU state. You might want to call this
@@ -70,8 +59,7 @@ class CPU:
 
         print(f"TRACE: %02X | %02X %02X %02X |" % (
             self.pc,
-            #self.fl,
-            #self.ie,
+            self.fl,
             self.ram_read(self.pc),
             self.ram_read(self.pc + 1),
             self.ram_read(self.pc + 2)
@@ -101,23 +89,6 @@ class CPU:
             # Increment the program counter
             if (self.ir & 0b00010000) == 0:
                 self.pc = (self.pc + ((self.ir >> 6) + 1)) & 0b11111111
-
-            # if self.ir == HLT:
-            #     print("Halting program. Goodbye.")
-            #     break
-            # elif self.ir == LDI:
-            #     self.reg[self.ram_read(self.pc+1)] = self.ram_read(self.pc+2)
-            # elif self.ir == MUL:
-            #     self.reg[self.ram_read(self.pc+1)] = self.reg[self.ram_read(self.pc+1)] + self.reg[self.ram_read(self.pc+2)]
-            # elif self.ir == PRN:
-            #     print(self.reg[self.ram_read(self.pc+1)])
-            # elif self.ir == NOP:
-            #     print("No Operation encountered. Continuing.")
-            # else:
-            #     print("Unknown command. Halting program. Goodbye.")
-            #     break
-
-            # self.pc += ((self.ir & 0b11000000) >> 6) + 1
 
     def ram_read(self, address = None):
         if address is not None:
