@@ -225,12 +225,12 @@ class Instructions():
     CMP         = 0b10100111
     def handle_CMP(self, r1, r2):
         self.cpu.fl = self.cpu.fl & 0b00000000
-        operand1 = self.cpu.reg[r1]
-        operand2 = self.cpu.reg[r2]
+        item1 = self.cpu.reg[r1]
+        item2 = self.cpu.reg[r2]
 
-        if operand1 < operand2:
+        if item1 < item2:
             self.cpu.fl = self.cpu.fl | 0b00000100
-        elif operand1 > operand2:
+        elif item1 > item2:
             self.cpu.fl = self.cpu.fl | 0b00000010
         else:
             self.cpu.fl = self.cpu.fl | 0b00000001
