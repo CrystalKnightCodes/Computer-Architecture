@@ -7,37 +7,33 @@ OPERATION CODES
 operation_codes = {
 'NOP'  : 0b00000000,
 'HLT'  : 0b00000001,
-'INT'  : 0b01010010,
-'IRET' : 0b00010011,
-'CALL' : 0b01010000,
+'ST'   : 0b10000100,
 'LD'   : 0b10000011,
 'LDI'  : 0b10000010,
-'ST'   : 0b10000100,
-'PUSH' : 0b01000101,
-'RET'  : 0b00010001,
-'POP'  : 0b01000110,
 'JMP'  : 0b01010100,
 'JEQ'  : 0b01010101,
 'JNE'  : 0b01010110,
-'JGE'  : 0b01011010,
-'JGT'  : 0b01010111,
-'JLE'  : 0b01011001,
 'JLT'  : 0b01011000,
+'JLE'  : 0b01011001,
+'JGT'  : 0b01010111,
+'JGE'  : 0b01011010,
 'PRA'  : 0b01001000,
 'PRN'  : 0b01000111,
-'ADD'  : 0b10100000,
-'AND'  : 0b10101000,
 'CMP'  : 0b10100111,
-'DEC'  : 0b01100110,
-'DIV'  : 0b10100011,
+'ADD'  : 0b10100000,
+'ADDI' : 0b10100101,
 'INC'  : 0b01100101,
-'MOD'  : 0b10100100,
+'SUB'  : 0b10100001,
+'SUBI' : 0b10101110,
+'DEC'  : 0b01100110,
 'MUL'  : 0b10100010,
-'NOT'  : 0b01101001,
-'OR'   : 0b10101010,
+'DIV'  : 0b10100011,
+'MOD'  : 0b10100100,
 'SHL'  : 0b10101100,
 'SHR'  : 0b10101101,
-'SUB'  : 0b10100001,
+'AND'  : 0b10101000,
+'OR'   : 0b10101010,
+'NOT'  : 0b01101001,
 'XOR'  : 0b10101011
 }
 
@@ -51,8 +47,9 @@ class Instructions():
     def __init__(self, cpu):
         self.cpu = cpu
 
+
     """
-    1. Basic
+    Basic
     """
     # NOP
     # No operation. Do nothing for this instruction.
@@ -72,47 +69,20 @@ class Instructions():
     def handle_HLT(self):
         sys.exit("HALT called! Exiting...")
 
-    # INT register
-    # Issue the interrupt number stored in the given register.
-    # This will set the _n_th bit in the IS register to the value in the given register.
-    # Machine code:
-    # 01010010 00000rrr
-    # 52 0r
-    INT         = 0b01010010
-    def handle_INT(self, r1):
-        #Future implementation
-        pass
-
-    # IRET
-    # Return from an interrupt handler.
-    # The following steps are executed:
-    # Registers R6-R0 are popped off the stack in that order.
-    # The FL register is popped off the stack.
-    # The return address is popped off the stack and stored in PC.
-    # Interrupts are re-enabled
-    # Machine code:
-    # 00010011
-    # 13
-    IRET        = 0b00010011
-    def handle_IRET(self):
-        #Future implementation
-        pass
-
-    # CALL register
-    # Calls a subroutine (function) at the address stored in the register.
-    # The address of the instruction directly after CALL is pushed onto the stack. This allows us to return to where we left off when the subroutine finishes executing.
-    # The PC is set to the address stored in the given register. We jump to that location in RAM and execute the first instruction in the subroutine. The PC can move forward or backwards from its current location.
-    # Machine code:
-    # 01010000 00000rrr
-    # 50 0r
-    CALL        = 0b01010000
-    def handle_CALL(self, r1):
-        #Future implementation
-        pass
 
     """
-    2. Memory Read/Write
+    Memory Read/Write
     """
+    # ST registerA registerB
+    # Store value in registerB in the address stored in registerA.
+    # This opcode writes to memory.
+    # Machine code:
+    # 10000100 00000aaa 00000bbb
+    # 84 0a 0b
+    ST          = 0b10000100
+    def handle_ST(self, r1, r2):
+        self.cpu.ram_write(self.cpu.reg[r1], self.cpu.reg[r2])
+
     # LD registerA registerB
     # Loads registerA with the value at the memory address stored in registerB.
     # This opcode reads from memory.
@@ -132,56 +102,9 @@ class Instructions():
     def handle_LDI(self, r1, r2):
         self.cpu.reg[r1] = r2
 
-    # ST registerA registerB
-    # Store value in registerB in the address stored in registerA.
-    # This opcode writes to memory.
-    # Machine code:
-    # 10000100 00000aaa 00000bbb
-    # 84 0a 0b
-    ST          = 0b10000100
-    def handle_ST(self, r1, r2):
-        self.cpu.ram_write(self.cpu.reg[r1], self.cpu.reg[r2])
 
     """
-    3. Stack Manipulation
-    """
-    # PUSH register
-    # Push the value in the given register on the stack.
-    # Decrement the SP.
-    # Copy the value in the given register to the address pointed to by SP.
-    # Machine code:
-    # 01000101 00000rrr
-    # 45 0r
-    PUSH        = 0b01000101
-    def handle_PUSH(self, r1):
-        #Future implementation
-        pass
-
-    # RET
-    # Return from subroutine.
-    # Pop the value from the top of the stack and store it in the PC.
-    # Machine Code:
-    # 00010001
-    # 11
-    RET         = 0b00010001
-    def handle_RET(self):
-        #Future implementation
-        pass
-
-    # POP register
-    # Pop the value at the top of the stack into the given register.
-    # Copy the value from the address pointed to by SP to the given register.
-    # Increment SP.
-    # Machine code:
-    # 01000110 00000rrr
-    # 46 0r
-    POP         = 0b01000110
-    def handle_POP(self, r1):
-        #Future implementation
-        pass
-
-    """
-    4. Jump & Conditional Jump
+    Jump & Conditional Jump
     """
     # JMP register
     # Jump to the address stored in the given register.
@@ -191,8 +114,7 @@ class Instructions():
     # 54 0r
     JMP         = 0b01010100
     def handle_JMP(self, r1):
-        #Future implementation
-        pass
+        self.cpu.pc = self.cpu.reg[r1]
 
     # JEQ register
     # If equal flag is set (true), jump to the address stored in the given register.
@@ -201,8 +123,10 @@ class Instructions():
     # 55 0r
     JEQ         = 0b01010101
     def handle_JEQ(self, r1):
-        #Future implementation
-        pass
+        if (self.cpu.fl & 0b00000001):
+            self.cpu.pc = self.cpu.reg[r1]
+        else:
+            self.cpu.pc = (self.cpu.pc + 2) & 0xff
 
     # JNE register
     # If E flag is clear (false, 0), jump to the address stored in the given register.
@@ -211,36 +135,10 @@ class Instructions():
     # 56 0r
     JNE         = 0b01010110
     def handle_JNE(self, r1):
-        #Future implementation
-        pass
-
-    # JGE register
-    # If greater-than flag or equal flag is set (true), jump to the address stored in the given register.
-    # 01011010 00000rrr
-    # 5A 0r
-    JGE         = 0b01011010
-    def handle_JGE(self, r1):
-        #Future implementation
-        pass
-
-    # JGT register
-    # If greater-than flag is set (true), jump to the address stored in the given register.
-    # Machine code:
-    # 01010111 00000rrr
-    # 57 0r
-    JGT         = 0b01010111
-    def handle_JGT(self, r1):
-        #Future implementation
-        pass
-
-    # JLE register
-    # If less-than flag or equal flag is set (true), jump to the address stored in the given register.
-    # 01011001 00000rrr
-    # 59 0r
-    JLE         = 0b01011001
-    def handle_JLE(self, r1):
-         #Future implementation
-        pass
+        if (self.cpu.fl & 0b00000001):
+            self.cpu.pc = (self.cpu.pc + 2) & 0xff
+        else:
+            self.cpu.pc = self.cpu.reg[r1]
 
     # JLT register
     # If less-than flag is set (true), jump to the address stored in the given register.
@@ -249,8 +147,45 @@ class Instructions():
     # 58 0r
     JLT         = 0b01011000
     def handle_JLT(self, r1):
-        #Future implementation
-        pass
+        if (self.cpu.fl & 0b00000100):
+            self.cpu.pc = self.cpu.reg[r1]
+        else:
+            self.cpu.pc = (self.cpu.pc + 2) & 0xff
+
+    # JLE register
+    # If less-than flag or equal flag is set (true), jump to the address stored in the given register.
+    # 01011001 00000rrr
+    # 59 0r
+    JLE         = 0b01011001
+    def handle_JLE(self, r1):
+        if (self.cpu.fl & 0b00000101):
+            self.cpu.pc = self.cpu.reg[r1]
+        else:
+            self.cpu.pc = (self.cpu.pc + 2) & 0xff
+
+    # JGT register
+    # If greater-than flag is set (true), jump to the address stored in the given register.
+    # Machine code:
+    # 01010111 00000rrr
+    # 57 0r
+    JGT         = 0b01010111
+    def handle_JGT(self, r1):
+        if (self.cpu.fl & 0b00000010):
+            self.cpu.pc = self.cpu.reg[r1]
+        else:
+            self.cpu.pc = (self.cpu.pc + 2) & 0xff            
+
+    # JGE register
+    # If greater-than flag or equal flag is set (true), jump to the address stored in the given register.
+    # 01011010 00000rrr
+    # 5A 0r
+    JGE         = 0b01011010
+    def handle_JGE(self, r1):
+        if (self.cpu.fl & 0b00000011):
+            self.cpu.pc = self.cpu.reg[r1]
+        else:
+            self.cpu.pc = (self.cpu.pc + 2) & 0xff
+
 
     """
     I/O Instructions
@@ -275,28 +210,10 @@ class Instructions():
     def handle_PRN(self, r1):
         print(self.cpu.reg[r1])
 
+
     """
     ALU Instructions
     """
-    # ADD registerA registerB
-    # Add the value in two registers and store the result in registerA.
-    # Machine code:
-    # 10100000 00000aaa 00000bbb
-    # A0 0a 0b
-    ADD         = 0b10100000
-    def handle_ADD(self, r1, r2):
-        self.cpu.reg[r1] = (self.cpu.reg[r1] + self.cpu.reg[r2]) & 0xff
-
-    # AND registerA registerB
-    # Bitwise-AND the values in registerA and registerB, then store the result in registerA.
-    # Machine code:
-    # 10101000 00000aaa 00000bbb
-    # A8 0a 0b
-    AND         = 0b10101000
-    def handle_AND(self, r1, r2):
-        #Future implementation
-        pass
-
     # CMP registerA registerB
     # Compare the values in two registers.
     # If they are equal, set the Equal E flag to 1, otherwise set it to 0.
@@ -307,8 +224,61 @@ class Instructions():
     # A7 0a 0b
     CMP         = 0b10100111
     def handle_CMP(self, r1, r2):
-        #Future implementation
-        pass
+        self.cpu.fl = self.cpu.fl & 0b00000000
+        operand1 = self.cpu.reg[r1]
+        operand2 = self.cpu.reg[r2]
+
+        if operand1 < operand2:
+            self.cpu.fl = self.cpu.fl | 0b00000100
+        elif operand1 < operand2:
+            self.cpu.fl = self.cpu.fl | 0b00000010
+        else:
+            self.cpu.fl = self.cpu.fl | 0b00000001
+
+    # ADD registerA registerB
+    # Add the value in two registers and store the result in registerA.
+    # Machine code:
+    # 10100000 00000aaa 00000bbb
+    # A0 0a 0b
+    ADD         = 0b10100000
+    def handle_ADD(self, r1, r2):
+        self.cpu.reg[r1] = (self.cpu.reg[r1] + self.cpu.reg[r2]) & 0xff
+
+    # ADDI register immediate
+    # Add an immediate value to the register.
+    # Machine code:
+    # 10100101 00000rrr iiiiiiii
+    # A5 0r ii
+    ADDI        = 0b10100101
+    def handle_ADDI(self, r1, val):
+        self.cpu.reg[r1] = (self.cpu.reg[r1] + val) & 0xff
+
+    # INC register
+    # Increment (add 1 to) the value in the given register.
+    # Machine code:
+    # 01100101 00000rrr
+    # 65 0r
+    INC         = 0b01100101
+    def handle_INC(self, r1):
+        self.cpu.reg[r1] = (self.cpu.reg[r1] + 1) & 0xff
+
+    # SUB registerA registerB
+    # Subtract the value in the second register from the first, storing the result in registerA.
+    # Machine code:
+    # 10100001 00000aaa 00000bbb
+    # A1 0a 0b
+    SUB         = 0b10100001
+    def handle_SUB(self, r1, r2):
+        self.cpu.reg[r1] = self.cpu.reg[r1] - self.cpu.reg[r2]
+
+    # SUBI register immediate
+    # Subtract an immediate value from the register.
+    # Machine code:
+    # 10101110 00000rrr iiiiiiii
+    # AE 0r ii
+    SUBI        = 0b10101110
+    def handle_SUBI(self, r1, val):
+        self.cpu.reg[r1] = (self.cpu.reg[r1] - val) & 0xff
 
     # DEC register
     # Decrement (subtract 1 from) the value in the given register.
@@ -317,8 +287,16 @@ class Instructions():
     # 66 0r
     DEC         = 0b01100110
     def handle_DEC(self, r1):
-        #Future implementation
-        pass
+        self.cpu.reg[r1] = (self.cpu.reg[r1] - 1) & 0xff
+
+    # MUL registerA registerB
+    # Multiply the values in two registers together and store the result in registerA.
+    # Machine code:
+    # 10100010 00000aaa 00000bbb
+    # A2 0a 0b
+    MUL         = 0b10100010
+    def handle_MUL(self, r1, r2):
+        self.cpu.reg[r1] = (self.cpu.reg[r1] * self.cpu.reg[r2]) & 0xff
 
     # DIV registerA registerB
     # Divide the value in the first register by the value in the second, storing the result in registerA.
@@ -328,17 +306,7 @@ class Instructions():
     # A3 0a 0b
     DIV         = 0b10100011
     def handle_DIV(self, r1, r2):
-        self.cpu.reg[r1] = (self.cpu.reg[r1] // self.cpu.reg[r2]) & 0xff
-
-    # INC register
-    # Increment (add 1 to) the value in the given register.
-    # Machine code:
-    # 01100101 00000rrr
-    # 65 0r
-    INC         = 0b01100101
-    def handle_INC(self, r1):
-        #Future implementation
-        pass
+        self.cpu.reg[r1] = (self.cpu.reg[r1] // self.cpu.reg[r2]) & 0xff        
 
     # MOD registerA registerB
     # Divide the value in the first register by the value in the second, storing the remainder of the result in registerA.
@@ -350,24 +318,28 @@ class Instructions():
     def handle_MOD(self, r1, r2):
         self.cpu.reg[r1] = self.cpu.reg[r1] % self.cpu.reg[r2]
 
-    # MUL registerA registerB
-    # Multiply the values in two registers together and store the result in registerA.
-    # Machine code:
-    # 10100010 00000aaa 00000bbb
-    # A2 0a 0b
-    MUL         = 0b10100010
-    def handle_MUL(self, r1, r2):
-        self.cpu.reg[r1] = (self.cpu.reg[r1] * self.cpu.reg[r2]) & 0xff
+    # Shift the value in registerA left by the number of bits specified in registerB, filling the low bits with 0.
+    # 10101100 00000aaa 00000bbb
+    # AC 0a 0b
+    SHL         = 0b10101100
+    def handle_SHL(self, r1, r2):
+        self.cpu.reg[r1] = self.cpu.reg[r1] << self.cpu.reg[r2]
 
-    # NOT register
-    # Perform a bitwise-NOT on the value in a register, storing the result in the register.
+    # Shift the value in registerA right by the number of bits specified in registerB, filling the high bits with 0.
+    # 10101101 00000aaa 00000bbb
+    # AD 0a 0b
+    SHR         = 0b10101101
+    def handle_SHR(self, r1, r2):
+        self.cpu.reg[r1] = self.cpu.reg[r1] >> self.cpu.reg[r2]
+
+    # AND registerA registerB
+    # Bitwise-AND the values in registerA and registerB, then store the result in registerA.
     # Machine code:
-    # 01101001 00000rrr
-    # 69 0r
-    NOT         = 0b01101001
-    def handle_NOT(self, r1):
-        #Future implementation
-        pass
+    # 10101000 00000aaa 00000bbb
+    # A8 0a 0b
+    AND         = 0b10101000
+    def handle_AND(self, r1, r2):
+        self.cpu.reg[r1] = self.cpu.reg[r1] & self.cpu.reg[r2]
 
     # OR registerA registerB
     # Perform a bitwise-OR between the values in registerA and registerB, storing the result in registerA.
@@ -376,33 +348,16 @@ class Instructions():
     # AA 0a 0b
     OR          = 0b10101010
     def handle_OR(self, r1, r2):
-        #Future implementation
-        pass
+        self.cpu.reg[r1] = self.cpu.reg[r1] | self.cpu.reg[r2]
 
-    # Shift the value in registerA left by the number of bits specified in registerB, filling the low bits with 0.
-    # 10101100 00000aaa 00000bbb
-    # AC 0a 0b
-    SHL         = 0b10101100
-    def handle_SHL(self, r1, r2):
-        #Future implementation
-        pass
-
-    # Shift the value in registerA right by the number of bits specified in registerB, filling the high bits with 0.
-    # 10101101 00000aaa 00000bbb
-    # AD 0a 0b
-    SHR         = 0b10101101
-    def handle_SHR(self, r1, r2):
-        #Future implementation
-        pass
-
-    # SUB registerA registerB
-    # Subtract the value in the second register from the first, storing the result in registerA.
+    # NOT register
+    # Perform a bitwise-NOT on the value in a register, storing the result in the register.
     # Machine code:
-    # 10100001 00000aaa 00000bbb
-    # A1 0a 0b
-    SUB         = 0b10100001
-    def handle_SUB(self, r1, r2):
-        self.cpu.reg[r1] = self.cpu.reg[r1] - self.cpu.reg[r2]
+    # 01101001 00000rrr
+    # 69 0r
+    NOT         = 0b01101001
+    def handle_NOT(self, r1):
+        self.cpu.reg[r1] = ~self.cpu.reg[r1]
 
     # XOR registerA registerB
     # Perform a bitwise-XOR between the values in registerA and registerB, storing the result in registerA.
@@ -411,10 +366,7 @@ class Instructions():
     # AB 0a 0b
     XOR         = 0b10101011
     def handle_XOR(self, r1, r2):
-        #Future implementation
-        pass
-
-
+        self.cpu.reg[r1] = self.cpu.reg[r1] ^ self.cpu.reg[r2]
 
 """
 END INSTRUCTIONS
